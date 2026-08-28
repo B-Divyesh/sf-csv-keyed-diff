@@ -12,7 +12,10 @@ export function captureLicense(): string | null {
   const url = new URL(location.href);
   const token = url.searchParams.get('license');
   if (token) {
-    localStorage.setItem(LICENSE_KEY, token.trim());
+    // A return token identifies a different purchase from the one whose
+    // verdict may be cached. Reusing that verdict could immediately discard
+    // a valid new token without ever asking the license service about it.
+    storeLicense(token);
     url.searchParams.delete('license');
     history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
   }

@@ -35,11 +35,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 [hidden] { display: none !important; }
 
 .site-header { width: min(1240px, calc(100% - 48px)); margin: 0 auto; min-height: 80px; display: flex; align-items: center; gap: 36px; border-bottom: 1px solid var(--line); }
-.wordmark { display: inline-flex; align-items: center; gap: 12px; font-weight: 800; text-decoration: none; letter-spacing: -.02em; }
+.wordmark { display: inline-flex; align-items: center; gap: 12px; min-width: 44px; min-height: 44px; font-weight: 800; text-decoration: none; letter-spacing: -.02em; }
 .mark { width: 24px; height: 24px; display: inline-block; border: 2px solid var(--lime); border-radius: 50%; position: relative; }
 .mark::after { content: ''; width: 3px; height: 13px; background: var(--lime); position: absolute; left: 9px; top: 15px; }
 .site-header nav { display: flex; gap: 28px; margin-left: auto; }
-.site-header nav a, footer nav a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 700; }
+.site-header nav a, footer nav a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 700; }
 .site-header nav a:hover, footer nav a:hover { color: var(--paper); }
 .privacy-chip { display: inline-flex; align-items: center; gap: 8px; color: var(--lime); border: 1px solid #526333; min-height: 36px; padding: 5px 12px; border-radius: 100px; font-size: 13px; font-weight: 800; }
 .offline-banner { position: relative; z-index: 20; text-align: center; padding: 8px 16px; background: var(--amber); color: #211b0a; font-weight: 800; font-size: 14px; }
@@ -83,6 +83,7 @@ h3, h4, p { margin-top: 0; }
 .step-label p { margin: 0; font-size: 14px; }
 .file-well { min-height: 148px; border: 1.5px dashed #85867f; padding: 24px; display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; cursor: pointer; background: #ebe8dd; transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease; }
 .file-well:hover, .file-well.dragging { background: #e3edcd; border-color: #405612; transform: translateY(-2px); }
+.file-well:focus-within { outline: 3px solid #6551df; outline-offset: 3px; border-color: #6551df; background: #e9eddf; }
 .file-well.loaded { border-style: solid; border-color: #638120; background: #e7eed8; }
 .file-well input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .file-well .secondary { color: #22251d; border-color: #777a71; }
@@ -164,6 +165,7 @@ h3, h4, p { margin-top: 0; }
 .price-panel ul { padding-left: 22px; margin: 24px 0; }.price-panel li { margin-bottom: 8px; }.price-panel .primary { width: 100%; }
 .text-button { appearance: none; border: 0; background: transparent; color: var(--paper); min-height: 44px; width: 100%; text-decoration: underline; cursor: pointer; margin-top: 8px; }
 #restore-form { border-top: 1px solid var(--line); padding-top: 16px; }#restore-form label { display: block; font-size: 13px; margin-bottom: 6px; }.license-row { display: flex; gap: 8px; }.license-row input { min-width: 0; flex: 1; min-height: 48px; border: 1px solid #656978; background: var(--ink); color: var(--paper); padding: 10px; }.license-status { margin: 12px 0 0; color: var(--lime); font-size: 14px; }.merchant { color: var(--muted); font-size: 12px; margin: 16px 0 0; }
+.merchant a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; vertical-align: middle; }
 
 footer { border-top: 1px solid var(--line); }.footer-inner { width: min(1240px, calc(100% - 48px)); min-height: 120px; margin: auto; display: flex; align-items: center; gap: 32px; }.footer-inner p { margin: 0 auto; color: var(--muted); font-size: 13px; }.footer-inner nav { display: flex; gap: 18px; }
 .legal { max-width: 760px; padding: 96px 0 120px; }.legal h1 { margin-bottom: 40px; }.legal h2 { font-size: 28px; margin: 48px 0 12px; }.legal p:not(.eyebrow) { color: #d1cec6; font-size: 17px; line-height: 1.65; }.policy-date { margin-top: 56px; font-size: 14px !important; color: var(--muted) !important; }
