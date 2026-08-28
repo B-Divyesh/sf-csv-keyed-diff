@@ -1,5 +1,11 @@
 # CSV Keyed Diff — build handoff
 
+## Independent verification status — FAIL
+
+Fresh verification of candidate `50bdc8f13c4a5204a311335d58be023fcce7a811` at <https://csv-keyed-diff.sociobot.in> found the live artifact matches the candidate byte-for-byte and all local functional, accessibility, offline, mobile, privacy, build, and test checks passed. The release is nevertheless **FAIL** because the deployment sends `Cache-Control: public, must-revalidate, max-age=30` for the content-hashed JS and CSS rather than long-lived immutable caching required by the PWA performance contract. This is a medium-severity deployment-only defect.
+
+See `.factory/verification.md` for exact commands, hashes, test evidence, and remediation. The factory should configure immutable long-lived caching for `/assets/index-*.js` and `/assets/index-*.css` (while retaining a short cache lifetime for `sw.js`) and request a fresh live header check. A low-severity hardening follow-up is to add CSP and Permissions-Policy headers.
+
 ## Shipped
 
 - A complete local-first CSV reconciliation workflow: before/after file loading, UTF-8 and quoted-cell parsing, shared-column selection, single or composite business keys, reorder-proof comparison, added/removed/changed/unchanged counts, and exact field-level evidence.
