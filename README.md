@@ -41,9 +41,12 @@ npm test
 npm run lint
 npm run build
 npm run test:e2e
+npm run test:live-checkout
 ```
 
 Unit coverage includes the seeded 10,000-row success fixture, quoted data, composite keys, reordered records, duplicate keys, report export, and static-host cache/security policy. Playwright covers the end-to-end comparison, axe serious/critical checks, offline reload and session recovery, legal routes, and 390 px layout. `dist/staticwebapp.config.json` configures immutable caching for hashed JS/CSS, short-lived worker updates, and the response security policy on Azure Static Web Apps.
+
+`test:live-checkout` is the release regression for the separately registered billing product. It checks the public Sociobot catalog entry, advertised price and return origin, then confirms that the production buy route redirects to Dodo's hosted HTTPS checkout. It creates an unpaid checkout session and requires network access.
 
 ## Product decisions and limits
 
