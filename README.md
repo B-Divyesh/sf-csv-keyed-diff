@@ -38,11 +38,12 @@ The exact deploy artifact is `dist/`, with `dist/index.html` at its root and sta
 
 ```sh
 npm test
+npm run lint
 npm run build
 npm run test:e2e
 ```
 
-Unit coverage includes the seeded 10,000-row success fixture, quoted data, composite keys, reordered records, duplicate keys, and report export. Playwright covers the end-to-end comparison, axe serious/critical checks, offline reload and session recovery, legal routes, and 390 px layout.
+Unit coverage includes the seeded 10,000-row success fixture, quoted data, composite keys, reordered records, duplicate keys, report export, and static-host cache/security policy. Playwright covers the end-to-end comparison, axe serious/critical checks, offline reload and session recovery, legal routes, and 390 px layout. `dist/staticwebapp.config.json` configures immutable caching for hashed JS/CSS, short-lived worker updates, and the response security policy on Azure Static Web Apps.
 
 ## Product decisions and limits
 

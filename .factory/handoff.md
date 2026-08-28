@@ -1,48 +1,74 @@
-# CSV Keyed Diff — build handoff
+# CSV Keyed Diff — repair handoff
 
-## Independent verification status — FAIL
+## Release status — PASS
 
-Fresh verification of candidate `50bdc8f13c4a5204a311335d58be023fcce7a811` at <https://csv-keyed-diff.sociobot.in> found the live artifact matches the candidate byte-for-byte and all local functional, accessibility, offline, mobile, privacy, build, and test checks passed. The release is nevertheless **FAIL** because the deployment sends `Cache-Control: public, must-revalidate, max-age=30` for the content-hashed JS and CSS rather than long-lived immutable caching required by the PWA performance contract. This is a medium-severity deployment-only defect.
+Repair work order `csv-keyed-diff-repair-1` resolved every release-blocking finding in the independent verification report at commit `37122392e5f3be4b61646cb07fafe1430aa105c3`, for candidate `50bdc8f13c4a5204a311335d58be023fcce7a811`.
 
-See `.factory/verification.md` for exact commands, hashes, test evidence, and remediation. The factory should configure immutable long-lived caching for `/assets/index-*.js` and `/assets/index-*.css` (while retaining a short cache lifetime for `sw.js`) and request a fresh live header check. A low-severity hardening follow-up is to add CSP and Permissions-Policy headers.
+Repair commit: `8c064e2a751ad3045d6d6dfcafd1f71103a9848e` (`fix: cache hashed static assets immutably`), pushed to `main` and deployed as the static `dist/` artifact to <https://csv-keyed-diff.sociobot.in> on 2026-08-28 UTC.
 
-## Shipped
+## What was repaired
 
-- A complete local-first CSV reconciliation workflow: before/after file loading, UTF-8 and quoted-cell parsing, shared-column selection, single or composite business keys, reorder-proof comparison, added/removed/changed/unchanged counts, and exact field-level evidence.
-- Duplicate keys are quarantined in a dedicated ambiguity state. The app shows row counts and source rows, and never guesses a pairing.
-- Reviewable expandable records, report filters, a UTF-8 BOM filtered CSV export, empty/loading/error states, a 50 MB safety limit, pagination for large reports, keyboard paths, and a purpose-built 390 px layout.
-- IndexedDB recovery for the current comparison, an explicit local-session clear action, and no CSV network transport.
-- Installable offline PWA with versioned app-shell caching, generated 192/512/maskable icons, offline status, navigation fallback, and an in-app update notice.
-- Optional $19 one-time Pro unlock through the Sociobot slug-based billing contract: hosted buy link, return-token capture, local storage, optimistic cached unlock, once-per-day background verification, revocation handling, and paste-to-restore. Pro adds JSON evidence export; the complete compare and filtered CSV export remain free.
-- `/privacy` and `/terms`, MIT license, full README, sitemap/robots, and no tracking/CDNs/remote fonts.
-- Original surreal editorial hero generated for the product and optimized to 30 KB desktop / 12 KB mobile WebP. Prompt, review, model, date, and license provenance are in `.factory/design.md` and `assets/src/hero.prompt.json`.
+- Added `public/staticwebapp.config.json`, copied into `dist/` by Vite, so Azure Static Web Apps serves Vite’s content-hashed `/assets/*.js` and `/assets/*.css` with `Cache-Control: public, max-age=31536000, immutable`.
+- Kept `sw.js` deliberately revalidatable with `Cache-Control: no-cache, no-store, must-revalidate`; the manifest is also revalidated, preserving PWA update detection.
+- Preserved the existing SPA fallback exclusions for assets and direct static files.
+- Closed the verifier’s low-severity hardening observation with a restrictive CSP (same-origin app resources plus the explicit Sociobot license API) and a Permissions-Policy that disables unused sensitive capabilities.
+- Added exact regression coverage in `tests/deployment.test.ts` for immutable JS/CSS, worker cache behavior, CSP/Permissions-Policy, and SPA fallback rules. `npm run lint` now explicitly runs the repository’s TypeScript type gate.
+
+## Live response evidence
+
+Fresh `HEAD` checks after deployment returned:
+
+- `/assets/index-U-sXWPMz.js`: `Cache-Control: public, max-age=31536000, immutable`
+- `/assets/index-Ckzq6nlQ.css`: `Cache-Control: public, max-age=31536000, immutable`
+- `/sw.js`: `Cache-Control: no-cache, no-store, must-revalidate`
+- `/manifest.webmanifest`: `Cache-Control: no-cache, must-revalidate`
+- JS, CSS, worker, and manifest all include the configured CSP and Permissions-Policy.
+
+The live SHA-256 bytes exactly match the deployed build:
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `index.html` | `6d23ad532062836604b6340a12c73a8f311302b6efafadada3a831ebf3df` |
+| `assets/index-U-sXWPMz.js` | `ca05ac6b065336fcc393e74989cbff94dd3fbb59de37ad552c85d428f0840789` |
+| `assets/index-Ckzq6nlQ.css` | `eccdf39fc3d43c8147b35338e34c375249db8f8a444565488deafcdd13d07e88` |
+| `sw.js` | `b2a1b1b8ffa18c3f2e26b7001c66c84e024bab8fe944f7cc6a5ac50761ecaf00` |
 
 ## Verification
 
-Run from a clean dependency install:
+From a clean dependency install, all gates passed:
 
 ```sh
 npm ci
 npm test
+npm run lint
 npm run build
 npm run test:e2e
+npm audit --omit=dev
+npm audit
 ```
 
-Verified on 2026-08-28:
+- `npm ci`: 63 packages audited; 0 vulnerabilities.
+- Unit/integration: 8/8 passed. This includes CSV parsing, composite key comparison, duplicate-key quarantine, CSV report export, the seeded 10,000-row fixture, and the new static deployment-policy regressions.
+- Type/lint: `tsc --noEmit` passed via `npm run lint`.
+- Production build: passed with `dist/index.html` and `dist/staticwebapp.config.json`. JS is 44,161 bytes / 16,148 bytes gzip; CSS is 15,941 bytes / 4,742 bytes gzip; mobile hero is 11,986 bytes. All remain within the static PWA budgets.
+- Playwright local production preview: 2/2 passed, covering real uploads and comparison, duplicate disclosure, axe serious/critical scan, IndexedDB restoration, offline reload, legal routes, and 390×844 overflow.
+- Fresh live browser exercise at 1440px and 390×844: visible keyboard skip link, real comparison and saved report, no 390px horizontal overflow, zero axe serious/critical violations, service-worker-controlled offline reload, and zero page/console errors.
+- PWA update: an isolated production-artifact server served a byte-changed worker after initial control; `registration.update()` installed it as waiting and displayed the in-app update toast.
+- Factory `verify-url.sh` against the live domain: HTTP 200, no console/page errors, `lang=en`, exactly one `h1`, `main` present, no missing image alt text, and no unlabeled buttons.
+- Lighthouse 12.8.2, fresh live mobile audit: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.1 s, CLS 0, TBT 20 ms.
+- Privacy/response policy: normal comparison sent no CSV data off-device; live checks found only same-origin app assets during the free workflow. The sole permitted external destination remains the optional Sociobot license API, explicitly allowed by CSP and documented in Privacy.
 
-- `npm audit --omit=dev`: 0 vulnerabilities; full install audit also reports 0.
-- Unit: 6/6 passed, including the seeded 10,000-row fixture with 15 additions, 20 removals, 30 updates, 9,950 unchanged rows, and reordered input.
-- Production build: passed; `dist/index.html` present. Uncompressed JS 44.16 KB (16.25 KB gzip), CSS 15.94 KB (4.73 KB gzip), no font payload, hero 29.8 KB desktop / 12.0 KB mobile.
-- Playwright: 2/2 passed. Covered real file upload and comparison, duplicate-key disclosure, IndexedDB restore, offline reload, serious/critical axe scan, legal routes, and 390×844 horizontal-overflow check.
-- Factory `verify-url.sh`: HTTP 200, no console/page errors, `lang=en`, exactly one `h1`, `main` present, no missing alt text, and no unlabeled buttons.
-- Lighthouse 12.8.2 mobile: Performance 100, Accessibility 100, Best Practices 100, SEO 100. LCP 1.36 s, CLS 0, total blocking time 0 ms.
-- Manual visual review: 1440×1000 and 390×844; all controls remain visible and the mobile page has no horizontal overflow.
-- Offline was tested explicitly with Playwright `context.setOffline(true)` after the first load; the full workbench and saved report reload from the service worker/IndexedDB.
+## Product scope retained
+
+- Complete local-first CSV reconciliation: UTF-8/quoted parsing, one or composite business keys, reorder-proof adds/removes/field diffs, duplicate-key quarantine, filters, CSV export, and explicit errors/empty states.
+- IndexedDB recovery, local-session clearing, PWA install/offline behavior, update notice, 50 MB safety limit, pagination, keyboard access, and 390px layout.
+- Optional $19 Sociobot/Dodo one-time Pro unlock for JSON evidence export; free comparison and CSV export remain ungated.
+- `/privacy`, `/terms`, MIT license, no analytics, no remote fonts/scripts, and generated-asset provenance remain unchanged in `.factory/design.md`.
 
 ## Known limits and next steps
 
-- Browser memory is the practical constraint; v1 intentionally caps each file at 50 MB and renders records in batches of 100.
-- Headers must match exactly for key selection. Normalization, fuzzy identity, database connectors, and cleansing are intentionally out of scope.
-- Duplicate-key groups require human reconciliation; this is an honesty constraint, not an unfinished automatic matcher.
-- The factory must register `csv-keyed-diff` with the Sociobot billing service before the production checkout link can sell licenses. No product ID or payment-provider integration is embedded here.
-- For very large future workloads, move CSV parsing/comparison into a Web Worker and consider OPFS streaming while retaining the same result contract.
+- Browser memory is the practical constraint; files are capped at 50 MB and records render in batches of 100.
+- Header names must match exactly for key selection. Normalization, fuzzy identity, connectors, and cleansing are intentionally out of scope.
+- Duplicate-key groups require human reconciliation and are intentionally never auto-paired.
+- The factory must register the Sociobot billing product before production checkout can sell licenses. No product ID or payment-provider integration is embedded here.
+- For substantially larger future workloads, move parsing/comparison into a Web Worker and consider OPFS streaming without changing the report contract.
