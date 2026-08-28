@@ -1,0 +1,30 @@
+{
+  "slug": "csv-keyed-diff",
+  "title": "CSV Keyed Diff",
+  "territory": "utilities",
+  "user": "An implementation or operations worker who must compare two customer CSV exports by business key and explain row/column changes without a database or spreadsheet gymnastics.",
+  "evidence": [
+    {
+      "url": "https://hn.algolia.com/api/v1/items/42957473",
+      "date": "2025-02-06",
+      "quote_or_summary": "A software implementation worker calls cleaning and mapping legacy CSV/XLSX exports for import a constant pain and asks for practical workarounds."
+    },
+    {
+      "url": "https://softwarerecs.stackexchange.com/questions/93314",
+      "date": "2025-05-22",
+      "quote_or_summary": "The asker needs a portable, gratis CSV comparison that highlights differing row/columns; line-by-line diff breaks when rows are added or removed."
+    }
+  ],
+  "recurrence": "Two 2025 business-data requests independently reject plain text diff because records move and the useful unit is a changed field by key.",
+  "current_workaround": "VLOOKUP/XLOOKUP, conditional formatting, text diff, Power Query, or ad hoc scripts.",
+  "incumbents_and_gap": "Excel, LibreOffice, Beyond Compare, csvkit, and Data Wrangler help, but setup is high and generic diff does not force a reviewable business-key comparison report.",
+  "smallest_useful_product": "Offline web app that accepts two CSVs, lets users choose one or more key columns, detects adds/removes/field changes, resolves duplicate keys, and exports a filtered change report. Non-goals: database connectors, cleansing automation, or cloud storage.",
+  "success_measure": "For a seeded 10k-row fixture with inserts, deletes, reorders, and updates, results match the expected keyed changes with 100% recall and users identify the chosen key in under two minutes.",
+  "artifact_class": "pwa-offline",
+  "monetization": "one-time",
+  "constraints": "All files stay local; handle UTF-8/quoted cells/large files; disclose duplicate-key ambiguity; make no inference from sensitive data.",
+  "est_build_effort": "S",
+  "why_distinct": "It is a reconciliation report generator, not a spreadsheet, generic diff viewer, or LLM data-cleaning wrapper.",
+  "confidence": 5,
+  "state": "BUILT"
+}
