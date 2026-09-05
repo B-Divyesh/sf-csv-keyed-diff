@@ -142,3 +142,42 @@ test('file wells expose keyboard focus and mobile links have 44px hit areas', as
     }
   }
 });
+
+test('invalid files explain recovery and valid files work afterward', async ({ page }) => {
+  await page.goto('/demo');
+  const beforeInput = page.locator('#file-before');
+  const afterInput = page.locator('#file-after');
+
+  await beforeInput.setInputFiles({ name: 'wrong.txt', mimeType: 'text/plain', buffer: Buffer.from('id\n1') });
+  await expect(page.locator('#status')).toContainText('is not a .csv file');
+  await beforeInput.setInputFiles({ name: 'empty.csv', mimeType: 'text/csv', buffer: Buffer.from('') });
+  await expect(page.locator('#status')).toContainText('This CSV is empty');
+  await beforeInput.setInputFiles({ name: 'duplicate.csv', mimeType: 'text/csv', buffer: Buffer.from('id,id\n1,2') });
+  await expect(page.locator('#status')).toContainText('Duplicate column header');
+  await beforeInput.setInputFiles({ name: 'wide.csv', mimeType: 'text/csv', buffer: Buffer.from('id,name\n1,Ada,extra') });
+  await expect(page.locator('#status')).toContainText('3 cells');
+
+  await beforeInput.setInputFiles({ name: 'recovered-before.csv', mimeType: 'text/csv', buffer: Buffer.from('id\n1') });
+  await afterInput.setInputFiles({ name: 'no-common.csv', mimeType: 'text/csv', buffer: Buffer.from('account\n1') });
+  await expect(page.locator('#key-options')).toContainText('No column names match');
+  await expect(page.getByRole('button', { name: 'Build change report' })).toBeDisabled();
+  await afterInput.setInputFiles({ name: 'recovered-after.csv', mimeType: 'text/csv', buffer: Buffer.from('id\n2') });
+  await expect(page.locator('#status')).toContainText('recovered-after.csv is ready');
+  await page.locator('#key-options input[value="id"]').evaluate((element: HTMLInputElement) => element.click());
+  await page.getByRole('button', { name: 'Build change report' }).click();
+  await expect(page.locator('.metric[data-kind="added"] > span')).toHaveText('1');
+  await expect(page.locator('.metric[data-kind="removed"] > span')).toHaveText('1');
+});
+
+test('large result sets reveal records in bounded groups', async ({ page }) => {
+  await page.goto('/demo');
+  const rows = Array.from({ length: 105 }, (_, index) => `${index + 1},Customer ${index + 1}`).join('\n');
+  await page.locator('#file-before').setInputFiles({ name: 'empty-before.csv', mimeType: 'text/csv', buffer: Buffer.from('id,name') });
+  await page.locator('#file-after').setInputFiles({ name: 'many-after.csv', mimeType: 'text/csv', buffer: Buffer.from(`id,name\n${rows}`) });
+  await page.locator('#key-options input[value="id"]').evaluate((element: HTMLInputElement) => element.click());
+  await page.getByRole('button', { name: 'Build change report' }).click();
+  await expect(page.locator('.record.added')).toHaveCount(100);
+  await expect(page.getByRole('button', { name: 'Show 5 more records' })).toBeVisible();
+  await page.getByRole('button', { name: 'Show 5 more records' }).click();
+  await expect(page.locator('.record.added')).toHaveCount(105);
+});

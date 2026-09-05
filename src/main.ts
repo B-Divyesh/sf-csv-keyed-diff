@@ -167,7 +167,7 @@ async function renderHome() {
     for (const side of ['before', 'after'] as const) {
       const data = state[side]; const well = element(`well-${side}`); const facts = element(`facts-${side}`);
       well.classList.toggle('loaded', Boolean(data));
-      facts.innerHTML = data ? `<strong>${escapeHtml(data.name)}</strong><span>${data.rows.length.toLocaleString()} rows · ${data.headers.length} columns</span>` : `<strong>Choose or drop a CSV</strong><span>Files over 50 MiB are rejected · stays on this device</span>`;
+      facts.innerHTML = data ? `<strong>${escapeHtml(data.name)}</strong><span>${data.rows.length.toLocaleString()} rows · ${data.headers.length} columns</span>` : `<strong>Choose or drop a CSV</strong><span>Files over 50 MiB are rejected. This file stays on your device.</span>`;
     }
   }
   function updateKeys() {
@@ -257,7 +257,7 @@ async function renderHome() {
 }
 
 function fileWell(side: 'before' | 'after', number: string, title: string, subtitle: string) {
-  return `<div><div class="step-label"><span>${number}</span><div><h3>${title}</h3><p>${subtitle}</p></div></div><label id="well-${side}" class="file-well" data-side="${side}" for="file-${side}"><input id="file-${side}" data-side="${side}" type="file" accept=".csv,text/csv"><span class="file-icon" aria-hidden="true">↥</span><span id="facts-${side}" class="file-facts"><strong>Choose or drop a CSV</strong><span>Files over 50 MiB are rejected · stays on this device</span></span><span class="button secondary">Browse files</span></label></div>`;
+  return `<div><div class="step-label"><span>${number}</span><div><h3>${title}</h3><p>${subtitle}</p></div></div><label id="well-${side}" class="file-well" data-side="${side}" for="file-${side}"><input id="file-${side}" data-side="${side}" type="file" accept=".csv,text/csv"><span class="file-icon" aria-hidden="true">↥</span><span id="facts-${side}" class="file-facts"><strong>Choose or drop a CSV</strong><span>Files over 50 MiB are rejected. This file stays on your device.</span></span><span class="button secondary">Browse files</span></label></div>`;
 }
 
 function setupConnectivity() {
