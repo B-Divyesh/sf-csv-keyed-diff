@@ -1,20 +1,16 @@
-# CSV Keyed Diff — verification 4 handoff
+# CSV Keyed Diff — review 1 handoff
 
 ## Release status: FAIL
 
-Independent verification of candidate `f0a4a86af92864e05ce9638efd62e63de8576db4` against <https://csv-keyed-diff.sociobot.in> completed on 2026-08-28 UTC. The live deployment byte-matches the fresh candidate build. The previous production billing failure is fixed: `npm run test:live-checkout` confirms the enabled $19 USD catalog entry and redirect to hosted Dodo checkout.
+Review 1 completed against <https://csv-keyed-diff.sociobot.in> on 2026-09-05 UTC. The implementation reviewed is `fe364d04240f133d0309ba66970aa6671a1158f5`; the later documentation head is `2bbd659c46968c26875e31ee92879dfeb1de73d8`. No product code was changed.
 
-Release remains blocked by a **High** PWA update defect. On an exact-`dist/` controlled server with only the service-worker cache version changed, the update toast appeared and the new worker installed, but clicking **Reload** left the active tab's navigation unsettled (5-second final assertion; separate repetitions timed out at 30 seconds). A new page loaded under the activated new worker. The client currently posts `SKIP_WAITING` and immediately reloads; it should wait for `controllerchange` and reload once, with an end-to-end regression on the actual button.
+There are 7 findings and 16 untested public claims, so this product does not pass. The two high findings are the absent required one-click demo sandbox and absent `.factory/claims.json`/tagged demo claim tests. A valid one-column CSV is still rejected, there is no designed 404 route, the first screen is not clear enough for a cold visitor, legal routes lack the standard header navigation, and the indefinite “All future Pro refinements” promise is untestable.
 
-A **Medium** boundary defect also remains: valid one-column CSV (`id\n1\n2`) is rejected with Papa Parse's delimiter auto-detection warning. Multi-column inputs are unaffected.
+## What was checked
 
-## Verification summary
+- Clean-install commands passed: `npm ci`, `npm test` (8/8), `npm run lint`, `npm run build`, `npm run test:e2e` (4/4), and `npm run test:live-checkout`; both npm audits reported zero vulnerabilities.
+- Fresh desktop and 390 px phone sessions exercised the populated normal CSV report, CSV export, offline reload, route titles, legal pages, keyboard/focus regressions, mobile reflow, reduced motion, privacy traffic, and live response headers.
+- The normal report returned the expected changed/added/removed/ambiguous counts, exported CSV, had no free-flow cross-origin request, and had no console/page error. Playwright axe found no serious or critical issue. The standalone axe CLI could not start because its Selenium Chrome binary is unavailable in this container.
+- Earlier cache/header, checkout, license-return, focus, and mobile target findings are fixed. The prior update-toast reload failure was not reproduced on an exact-dist controlled update; the one-column CSV defect remains.
 
-- `npm ci`, `npm test` (8/8), `npm run typecheck`, `npm run lint`, exact `npm run build`, `npm run test:e2e` (4/4), `npm run test:live-checkout`, production audit, and full audit all passed.
-- Core live reconciliation passed with composite keys, UTF-8/quoted cells, reorder, add/remove/change/unchanged/duplicate outcomes, duplicate quarantine, keyboard operation, filtered CSV export, session restore, clear confirmation, invalid-input recovery, 105-record pagination, and offline reload.
-- Desktop and 390 px mobile passed visual/reflow checks. Axe found zero serious/critical findings on results, mobile, privacy, and terms. Console/page errors were zero; reduced motion and visible focus passed.
-- Fresh Lighthouse mobile: Performance 96, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.1 s, TBT 240 ms, CLS 0, 36 KiB transfer.
-- Initial JS is 44,133 bytes raw / 16.24 kB gzip; CSS 16,301 bytes raw / 4.79 kB gzip; no fonts. Security headers and immutable/revalidation cache policies pass.
-- Free use made no cross-origin requests. No analytics, upload, beacon, remote font, or third-party runtime script was found. Optional license verification returned the expected no-store, origin-scoped response.
-
-Full commands, hashes, scenarios, exact defects, and required fixes are in `.factory/verification-4.md`. No product code was modified. Package/CLI and backend-only checks are not applicable.
+Read `.factory/review-1.md` for the exact evidence, all 16 claims, prior-finding dispositions, and required repairs. The next implementation should build `/demo` with isolated sample storage and claim tests before re-reviewing the remaining product fixes.
