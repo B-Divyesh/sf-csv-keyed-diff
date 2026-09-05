@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 type StaticWebAppConfig = {
   globalHeaders: Record<string, string>;
-  navigationFallback: { rewrite: string; exclude: string[] };
+  navigationFallback?: { rewrite: string; exclude: string[] };
+  responseOverrides: Record<string, { rewrite: string }>;
   routes: Array<{ route: string; headers?: Record<string, string> }>;
 };
 
@@ -30,9 +31,7 @@ describe('static deployment policy', () => {
     expect(config.globalHeaders['Content-Security-Policy'])
       .toContain("connect-src 'self' https://api.sociobot.in");
     expect(config.globalHeaders['Permissions-Policy']).toContain('camera=()');
-    expect(config.navigationFallback).toEqual({
-      rewrite: '/index.html',
-      exclude: ['/assets/*', '/*.{css,js,png,jpg,svg,webp,ico,woff2,json,txt,xml,wasm}'],
-    });
+    expect(config.navigationFallback).toBeUndefined();
+    expect(config.responseOverrides['404']).toEqual({ rewrite: '/404.html' });
   });
 });

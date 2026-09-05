@@ -15,6 +15,16 @@ describe('CSV parser', () => {
     expect(() => parseCsv('id,id\n1,2')).toThrow(/Duplicate column header/);
     expect(() => parseCsv('id,name\n1,A,extra')).toThrow(/3 cells/);
   });
+
+  it('accepts a valid one-column CSV for key-only reconciliation', () => {
+    const before = parseCsv('id\n1\n2\n');
+    const after = parseCsv('id\n2\n3\n');
+    const result = compareCsv(before, after, ['id']);
+
+    expect(before).toEqual({ name: 'CSV', headers: ['id'], rows: [{ id: '1' }, { id: '2' }] });
+    expect({ added: result.added.map((item) => item.key), removed: result.removed.map((item) => item.key), unchanged: result.unchanged })
+      .toEqual({ added: ['id=3'], removed: ['id=1'], unchanged: 1 });
+  });
 });
 
 describe('keyed comparison', () => {

@@ -1,62 +1,87 @@
 # CSV Keyed Diff
 
-CSV Keyed Diff is a private, offline-capable reconciliation report generator for implementation and operations teams. It compares two CSV exports by one or more business-key columns, then explains added records, removed records, and exact field changes even when rows were reordered.
+Compare two CSV exports by business key and explain every changed field. The app is for implementation and operations teams.
 
 Live product: <https://csv-keyed-diff.sociobot.in>
 
+One-click sample: <https://csv-keyed-diff.sociobot.in/demo>
+
 ## What it does
 
-- Parses UTF-8 CSV, quoted commas, escaped quotes, and quoted line breaks.
-- Aligns records by a user-selected single or composite key.
-- Reports additions, removals, and field-level changes.
-- Quarantines duplicate-key groups rather than inventing a pairing.
-- Filters the review and exports the same filtered evidence as CSV.
-- Recovers the current session from local IndexedDB and works after an offline reload.
-- Offers an optional $19 one-time Pro license for JSON evidence bundles; the complete CSV comparison and CSV report are free.
+- Reads UTF-8, quoted commas, escaped quotes, quoted line breaks, and one-column CSV files.
+- Aligns records by one selected key or a composite key.
+- Finds additions, removals, and field changes even when rows move.
+- Lists duplicate-key groups without guessing which records match.
+- Filters the review and exports the same evidence as CSV.
+- Restores a real session from local IndexedDB after a refresh.
+- Works offline after the first visit.
 
-Files are processed entirely in the browser. There is no CSV upload, analytics script, third-party runtime script, or remote font. Only Pro purchase and license verification contact the Sociobot billing API.
+The complete comparison and CSV report are free. A $19 one-time Pro license for one user adds JSON evidence export.
+
+CSV files stay in the browser. The app has no analytics, tracking pixel, remote font, or third-party runtime script.
+
+## Try the isolated sample
+
+Open `/demo` or select **Try it with sample data**. A filled report appears immediately.
+
+The banner remains visible while the demo is active. **Reset demo** restores the sample, and **Start for real** leaves it.
+
+Demo changes use memory only. They never read or write the real IndexedDB session or license storage.
+
+See [.factory/demo.md](.factory/demo.md) for the sample contents and isolation details.
 
 ## Run locally
 
-Requires Node.js 20 or newer.
+Use Node.js 20 or newer.
 
 ```sh
-npm install
+npm ci
 npm run dev
 ```
 
-Vite prints the local development URL. For the production build:
+Build and serve the production artifact:
 
 ```sh
 npm run build
 npm run preview
 ```
 
-The exact deploy artifact is `dist/`, with `dist/index.html` at its root and static copies for `/privacy` and `/terms`.
+The deploy artifact is `dist/`. It contains real files for `/demo`, `/privacy`, `/terms`, and the designed 404 response.
 
 ## Verify
 
+Run the full local gate from a clean checkout:
+
 ```sh
+npm ci
 npm test
 npm run lint
 npm run build
 npm run test:e2e
+npm run test:claims
 npm run test:live-checkout
 ```
 
-Unit coverage includes the seeded 10,000-row success fixture, quoted data, composite keys, reordered records, duplicate keys, report export, and static-host cache/security policy. Playwright covers the end-to-end comparison, axe serious/critical checks, offline reload and session recovery, legal routes, and 390 px layout. `dist/staticwebapp.config.json` configures immutable caching for hashed JS/CSS, short-lived worker updates, and the response security policy on Azure Static Web Apps.
+The checkout test requires network access. It creates an unpaid checkout session and checks the registered price and return origin.
 
-`test:live-checkout` is the release regression for the separately registered billing product. It checks the public Sociobot catalog entry, advertised price and return origin, then confirms that the production buy route redirects to Dodo's hosted HTTPS checkout. It creates an unpaid checkout session and requires network access.
+Every visitor-facing product claim is registered in [.factory/claims.json](.factory/claims.json). Each entry names its clean demo command and observable result.
 
-## Product decisions and limits
+Unit coverage includes the seeded 10,000-row fixture, quoted data, composite keys, duplicate keys, one-column files, and report export. Browser coverage includes normal, invalid, boundary, recovery, keyboard, mobile, privacy, offline, legal, and 404 paths.
 
-- Column names must match exactly across files for use as a key; the app does not infer identities from sensitive data.
-- Duplicate keys are displayed for human review and excluded from automatic pairings.
-- Files are limited to 50 MB to keep browser memory use predictable.
-- The current session is saved only on the device and can be erased with **Clear local session**.
-- The factory registers the billing product separately. The client uses the slug-based Sociobot contract and contains no payment-provider code or product ID.
+## Product limits
 
-The researched scope is in `.factory/brief.json`, visual decisions and asset provenance are in `.factory/design.md`, and final verification is recorded in `.factory/handoff.md`.
+- Key column names must match exactly across both files.
+- The app does not infer identity or use fuzzy matching.
+- Duplicate keys require human review and are excluded from automatic pairing.
+- A file can be at most 50 MiB. Larger files are rejected before parsing.
+- **Clear local session** removes the saved comparison from IndexedDB.
+- Pro purchase and verification use the Sociobot billing API.
+
+The researched scope is in [.factory/brief.json](.factory/brief.json). Visual decisions and asset provenance are in [.factory/design.md](.factory/design.md).
+
+## Deploy
+
+Deploy only the contents of `dist/` to the product's static host. Do not deploy source files or change shared infrastructure.
 
 ## License
 

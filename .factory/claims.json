@@ -1,0 +1,107 @@
+[
+  {
+    "id": "demo-sandbox",
+    "claim": "The one-click sample resets without reading or changing a real saved session.",
+    "where": "landing action, demo banner, privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:demo-sandbox\"",
+    "sandbox": "fresh browser context; enter through /demo, create a real session, change and reset demo data, then confirm the real session is unchanged"
+  },
+  {
+    "id": "local-processing",
+    "claim": "CSV contents and filenames stay in the browser; the free workflow loads no remote scripts, fonts, analytics, or tracking pixels.",
+    "where": "landing facts, file controls, privacy page, footer, README",
+    "test": "npm run test:claims -- --grep \"@claim:local-processing\"",
+    "sandbox": "fresh /demo context; compare a marked private value while recording every request and loaded resource"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The populated comparison works offline after the first visit.",
+    "where": "landing facts, offline banner, README",
+    "test": "npm run test:claims -- --grep \"@claim:offline-reload\"",
+    "sandbox": "dedicated fresh browser context; load /demo, wait for service-worker control, set the context offline, and reload"
+  },
+  {
+    "id": "csv-values",
+    "claim": "The parser keeps UTF-8 text, quoted commas, escaped quotes, and quoted line breaks.",
+    "where": "How it works, README",
+    "test": "npm run test:claims -- --grep \"@claim:csv-values\"",
+    "sandbox": "fresh /demo context with custom quoted UTF-8 files; compare and inspect rendered before/after field values"
+  },
+  {
+    "id": "key-alignment",
+    "claim": "One or more selected columns align business records.",
+    "where": "landing title, key step, README",
+    "test": "npm run test:claims -- --grep \"@claim:key-alignment\"",
+    "sandbox": "fresh /demo context with tenant and id as a composite key; assert exact changed and unchanged outcomes"
+  },
+  {
+    "id": "reorder-changes",
+    "claim": "Reordered rows still yield exact added, removed, changed, and unchanged records.",
+    "where": "landing copy, How it works, README",
+    "test": "npm run test:claims -- --grep \"@claim:reorder-changes\"",
+    "sandbox": "fresh /demo sample whose after rows are reordered; assert each populated outcome count"
+  },
+  {
+    "id": "duplicate-keys",
+    "claim": "Duplicate keys are disclosed and excluded from automatic pairing counts.",
+    "where": "How it works, result notice, README",
+    "test": "npm run test:claims -- --grep \"@claim:duplicate-keys\"",
+    "sandbox": "fresh /demo sample; assert the ambiguous count, duplicate rows, and exclusion notice"
+  },
+  {
+    "id": "csv-export",
+    "claim": "The selected result filters control the CSV evidence export.",
+    "where": "export action, Pro copy, README",
+    "test": "npm run test:claims -- --grep \"@claim:csv-export\"",
+    "sandbox": "fresh /demo sample; disable three filters, download the report, and assert its header and changed-only evidence rows"
+  },
+  {
+    "id": "session-restore",
+    "claim": "A real local comparison returns after a refresh.",
+    "where": "privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:session-restore\"",
+    "sandbox": "fresh /demo entry; start for real, build a comparison, reload, and assert the filenames and report return"
+  },
+  {
+    "id": "session-clear",
+    "claim": "Clear local session removes the real comparison from browser storage.",
+    "where": "clear action, privacy page, README",
+    "test": "npm run test:claims -- --grep \"@claim:session-clear\"",
+    "sandbox": "fresh /demo entry; create a real session, confirm clear, reload, and assert the empty state remains"
+  },
+  {
+    "id": "file-limit",
+    "claim": "A CSV at 50 MiB is accepted and a larger file is rejected.",
+    "where": "file controls, README",
+    "test": "npm run test:claims -- --grep \"@claim:file-limit\"",
+    "sandbox": "fresh /demo context; submit files at the exact boundary and one byte above it, then assert ready and error outcomes"
+  },
+  {
+    "id": "free-workflow",
+    "claim": "CSV comparison and filtered CSV export work without a license, payment, or account.",
+    "where": "landing facts, Pro section, privacy page, terms, README",
+    "test": "npm run test:claims -- --grep \"@claim:free-workflow\"",
+    "sandbox": "fresh /demo context with no license; assert populated outcomes and inspect the downloaded CSV report"
+  },
+  {
+    "id": "pro-json",
+    "claim": "Pro costs $19 once for one user, restores by token, exports JSON evidence, and sends no CSV data for verification.",
+    "where": "Pro section, privacy page, terms, README",
+    "test": "npm run test:claims -- --grep \"@claim:pro-json\" && npm run test:live-checkout",
+    "sandbox": "fresh /demo entry; start for real, use a recorded valid verification response, restore the token, and inspect JSON; then verify the public hosted checkout registration"
+  },
+  {
+    "id": "exact-matching",
+    "claim": "The app uses exact selected keys and does not infer or fuzzy-match identities.",
+    "where": "How it works, README",
+    "test": "npm run test:claims -- --grep \"@claim:exact-matching\"",
+    "sandbox": "fresh /demo context with visually similar but unequal keys; assert they remain an addition and removal"
+  },
+  {
+    "id": "one-column",
+    "claim": "A key-only one-column CSV supports added, removed, and unchanged reconciliation.",
+    "where": "README",
+    "test": "npm run test:claims -- --grep \"@claim:one-column\"",
+    "sandbox": "fresh /demo context with one-column before and after files; assert exact output counts"
+  }
+]
