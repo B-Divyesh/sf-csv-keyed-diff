@@ -1,6 +1,6 @@
-const VERSION = 'csv-keyed-diff-v3';
+const VERSION = 'csv-keyed-diff-v4';
 const SHELL = [
-  '/', '/index.html', '/offline.html', '/manifest.webmanifest',
+  '/', '/index.html', '/demo', '/privacy', '/terms', '/404.html', '/404.css', '/offline.html', '/offline.css', '/manifest.webmanifest',
   '/assets/reconciliation-lens.webp', '/assets/reconciliation-lens-mobile.webp',
   '/icons/icon.svg', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-maskable-512.png'
 ];
@@ -33,7 +33,11 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(fetch(event.request).then((response) => {
       const copy = response.clone(); caches.open(VERSION).then((cache) => cache.put(event.request, copy)); return response;
-    }).catch(async () => (await caches.match(event.request)) || (await caches.match('/index.html')) || caches.match('/offline.html')));
+    }).catch(async () => {
+      const knownPage = ['/', '/index.html', '/demo', '/demo/', '/privacy', '/privacy/', '/terms', '/terms/'].includes(url.pathname);
+      if (!knownPage) return (await caches.match('/404.html')) || caches.match('/offline.html');
+      return (await caches.match(event.request)) || (await caches.match(url.pathname.replace(/\/$/, '') || '/')) || (await caches.match('/index.html')) || caches.match('/offline.html');
+    }));
     return;
   }
   event.respondWith((async () => {

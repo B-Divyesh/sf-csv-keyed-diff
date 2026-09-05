@@ -54,8 +54,10 @@ export function parseCsv(text: string, name = 'CSV'): CsvData {
     skipEmptyLines: 'greedy',
   });
 
-  if (parsed.errors.length) {
-    const first = parsed.errors[0];
+  const first = parsed.errors.find((error) =>
+    error.code !== 'UndetectableDelimiter' || parsed.data.some((row) => row.length > 1),
+  );
+  if (first) {
     throw new Error(`CSV could not be read near row ${(first.row ?? 0) + 1}: ${first.message}`);
   }
   if (!parsed.data.length) throw new Error('This CSV is empty. Choose a file with a header row.');
