@@ -123,3 +123,29 @@ verb-first description.
 This is a static local-first PWA. Backend tenant isolation, restart
 persistence, health, rate-limit/429, SQLite, and CLI/library/desktop consumer
 checks do not apply.
+
+## Verification 6 handoff — 2026-09-05 UTC
+
+Independent QA reviewed implementation
+`a407ad7aeb4ec7194f6992f5ff0f74de165d6e59` and documentation head
+`da57e4f263ed383bc9f75f45de680899af331205`. Result: **PASS — zero findings
+and zero untested public claims.** No product code changed during verification.
+
+The verifier ran `npm ci`, unit tests (10/10), lint, build, the full E2E suite
+(30/30), every one of the 17 declared claim commands separately, the combined
+claim suite (17/17), checkout registration, and both audits. The 17 claim tests
+also passed against the live HTTPS origin; 12 live-safe app checks passed, while
+the production-artifact-only worker update check passed locally.
+
+Fresh desktop and phone sessions stated the job, audience, and sample action
+before scrolling. `/demo` showed the persistent isolated-sample label and the
+expected 2 changed / 1 added / 1 removed / 1 duplicate / 1 unchanged report;
+reset restored it. Offline export, demo isolation, invalid/boundary/recovery,
+keyboard, focus, reduced motion, legal routes, links, privacy behavior, and the
+designed HTTP 404 passed through the browser regressions. Live assets
+byte-match the implementation build. Lighthouse scored 100 for Performance,
+Accessibility, Best Practices, and SEO (LCP 1.1 s; CLS 0).
+
+Known limits remain intentional product boundaries, not QA findings: CSV files
+over 50 MiB are rejected; duplicate keys require human review; selected key
+names must match exactly; no database connector or cloud sync is provided.
