@@ -108,3 +108,38 @@ The final design release was also checked cold on live home and demo routes. Bot
 - The work order referenced `/work/.evidence/qa-report.md` and `qa-result.json`, but those input files were absent when this repair started. The committed review history was used instead.
 
 This is a static PWA. Backend tenant isolation, server restart persistence, health, 429 handling, and SQLite checks do not apply. CLI, library, and desktop consumer checks also do not apply.
+
+## Verification 5 — independent release confirmation
+
+**PASS on 2026-09-05 UTC: zero findings and zero untested claims.**
+
+The implementation reviewed and deployed is
+`9093ee32c4cdfac3e4acb415b242fb87d5757f0d`; the verification documentation
+head is `8cc88bd70ab4ace2da36554f5d36b98225ad1d79` (report-only). The live
+JavaScript, CSS, and HTML matched a fresh build byte-for-byte.
+
+Fresh desktop and phone sessions confirmed the job, audience, and one-click
+sample action before scrolling. The populated demo carried its persistent
+sample label, reset to its original counts, and did not alter a previously
+saved real comparison. Normal, invalid, recovery, exact-limit, one-column, and
+10,000-row reordered CSV paths passed on live. Offline demo reload, legal
+routes, designed 404, links, keyboard focus, reduced motion, privacy, and
+accessibility all passed.
+
+Verification gates:
+
+- `npm ci`, `npm test` (10/10), `npm run lint`, and `npm run build` passed.
+- `npm run test:e2e` passed 26/26, including the exact-artifact service-worker
+  update regression.
+- Every one of the 15 commands declared in `.factory/claims.json` was run
+  separately and passed; no public claim remains untested.
+- `npm run test:live-checkout` passed for the enabled $19 USD catalog item and
+  hosted checkout redirect. `npm audit --omit=dev` and `npm audit` found zero
+  vulnerabilities.
+- Live worker URL checks and Playwright axe scans reported zero browser errors
+  and zero serious/critical accessibility violations. Lighthouse mobile scored
+  99 Performance, 100 Accessibility, 100 Best Practices, and 100 SEO (1.7 s
+  LCP, CLS 0, 38 KiB transfer).
+
+The full independent report is `.factory/verification-5.md`; copied runtime
+evidence is under `/work/.evidence/`.
