@@ -84,7 +84,7 @@ test('@claim:local-processing a complete comparison sends no CSV data or runtime
   expect(remoteResources).toEqual([]);
 });
 
-test('@claim:offline-reload the populated sample reloads after the browser goes offline', async ({ browser }) => {
+test('@claim:offline-reload the populated sample reloads and exports CSV after the browser goes offline', async ({ browser }) => {
   const context = await browser.newContext();
   try {
     const page = await context.newPage();
@@ -97,6 +97,9 @@ test('@claim:offline-reload the populated sample reloads after the browser goes 
     await expect(page.getByText(/Offline — comparison and CSV export still work/)).toBeVisible();
     await expect(page.getByText('Demo — sample data, nothing is saved')).toBeVisible();
     await expectMetric(page, 'changed', 2);
+    const download = await downloadText(page, 'Export filtered CSV');
+    expect(download.name).toBe('csv-keyed-diff-report.csv');
+    expect(download.text).toContain('changed,AC-1042');
   } finally {
     await context.close();
   }
@@ -238,6 +241,70 @@ test('@claim:pro-json a valid restored Pro license enables a structured JSON evi
   const evidence = JSON.parse(download.text);
   expect(evidence).toEqual(expect.objectContaining({ before: 'real-before.csv', after: 'real-after.csv' }));
   expect(evidence.report.changed).toHaveLength(1);
+});
+
+test('@claim:pro-offline a cached Pro license keeps JSON evidence available offline and checks on reconnect', async ({ browser }) => {
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    await page.goto('/');
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    if (!await page.evaluate(() => Boolean(navigator.serviceWorker.controller))) await page.reload();
+    await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+    await loadPair(page);
+    await chooseKeysAndCompare(page, ['id']);
+    await page.evaluate(() => {
+      localStorage.setItem('sb_license:csv-keyed-diff', 'offline-fixture-license');
+      localStorage.setItem('sb_license_verdict:csv-keyed-diff', JSON.stringify({ valid: true, reason: 'ok', checkedAt: 0 }));
+    });
+
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.locator('#license-status')).toHaveText('Pro remains available offline. It will check when you are online.');
+    await expect(page.getByRole('button', { name: 'Export evidence JSON' })).toBeVisible();
+    const offlineExport = await downloadText(page, 'Export evidence JSON');
+    expect(JSON.parse(offlineExport.text)).toEqual(expect.objectContaining({ before: 'real-before.csv', after: 'real-after.csv' }));
+
+    let verificationRequests = 0;
+    await page.route('https://api.sociobot.in/api/v1/products/csv-keyed-diff/verify?license=offline-fixture-license', async (route) => {
+      verificationRequests += 1;
+      await route.fulfill({ json: { valid: true, reason: 'ok' } });
+    });
+    await context.setOffline(false);
+    await expect.poll(() => verificationRequests).toBe(1);
+    await expect(page.locator('#license-status')).toContainText('Pro is active on this device');
+    expect(verificationRequests).toBe(1);
+  } finally {
+    await context.close();
+  }
+});
+
+test('@claim:pro-revocation a revoked license response removes Pro JSON access', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('sb_license:csv-keyed-diff')) {
+      localStorage.setItem('sb_license:csv-keyed-diff', 'revoked-fixture-license');
+      localStorage.setItem('sb_license_verdict:csv-keyed-diff', JSON.stringify({ valid: true, reason: 'ok', checkedAt: Date.now() }));
+    }
+  });
+  let verificationRequests = 0;
+  await page.route('https://api.sociobot.in/api/v1/products/csv-keyed-diff/verify?license=revoked-fixture-license', async (route) => {
+    verificationRequests += 1;
+    await route.fulfill({ json: { valid: false, reason: 'revoked' } });
+  });
+  await startReal(page);
+  await loadPair(page);
+  await chooseKeysAndCompare(page, ['id']);
+  await expect(page.getByRole('button', { name: 'Export evidence JSON' })).toBeVisible();
+  await page.evaluate(() => {
+    const key = 'sb_license_verdict:csv-keyed-diff';
+    const verdict = JSON.parse(localStorage.getItem(key) ?? '{}');
+    localStorage.setItem(key, JSON.stringify({ ...verdict, checkedAt: 0 }));
+  });
+  await page.reload();
+  await expect(page.locator('#license-status')).toContainText('The license is not active (revoked).');
+  await expect(page.getByRole('button', { name: 'Export evidence JSON' })).toBeHidden();
+  expect(await page.evaluate(() => localStorage.getItem('sb_license:csv-keyed-diff'))).toBeNull();
+  expect(verificationRequests).toBe(1);
 });
 
 test('@claim:exact-matching similar values are not inferred to be the same key', async ({ page }) => {

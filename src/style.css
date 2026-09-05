@@ -160,6 +160,7 @@ h3, h4, p { margin-top: 0; }
 .status-word { font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .changed .status-word { color: var(--iris); }.added .status-word { color: var(--aqua); }.removed .status-word { color: var(--coral); }.duplicate .status-word { color: var(--amber); }
 .record-body { margin: 0 0 24px 105px; padding: 24px; background: var(--ink-raised); animation: detail 180ms both ease-out; overflow-x: auto; }
+.record-title { margin: 0 0 18px; color: var(--paper); font-family: var(--display); font-size: 24px; font-weight: 400; line-height: 1.15; }
 .field-table { min-width: 600px; }
 .field-head, .field-row { display: grid; grid-template-columns: minmax(130px, .7fr) 1fr 1fr; gap: 1px; }
 .field-head span { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 8px 12px; }

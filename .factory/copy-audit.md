@@ -38,8 +38,17 @@ Audited 5 September 2026. Counts treat hyphenated terms as one word. No sentence
 | The full keyed comparison and filtered CSV report are free. | 10 | Pass; tested claim. |
 | Pro adds a structured JSON file for implementation handoffs. | 9 | Pass; tested claim. |
 | One-time purchase · one user | 5 | Pass; tested claim. |
+| Buy Pro securely (Sociobot checkout) | 5 | Pass; identifies the external checkout. |
 | Sociobot and Dodo handle checkout as merchant of record. | 9 | Pass; live checkout test. |
 | This site uses generated imagery. | 5 | Pass; disclosure. |
+
+## License status
+
+| Copy | Words | Result |
+| --- | ---: | --- |
+| Pro remains available offline. | 4 | Pass; tested claim. |
+| It will check when you are online. | 7 | Pass; tested claim. |
+| If their license service reports a revoked license, the app removes Pro access. | 13 | Pass; tested claim. |
 
 ## Terminology
 

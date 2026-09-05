@@ -41,7 +41,7 @@ function sharedHeader() {
 }
 
 function sharedFooter() {
-  return `<footer><div class="footer-inner"><a class="wordmark" href="/" aria-label="CSV Keyed Diff home"><span class="mark" aria-hidden="true"></span> CSV Keyed Diff</a><p>Compare CSV files by key on your device. This site uses generated imagery.<br><span>Built by Param Factory · v1.1.0</span></p><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/B-Divyesh/sf-csv-keyed-diff">Source</a></nav></div></footer>`;
+  return `<footer><div class="footer-inner"><a class="wordmark" href="/" aria-label="CSV Keyed Diff home"><span class="mark" aria-hidden="true"></span> CSV Keyed Diff</a><p>Compare CSV files by key on your device. This site uses generated imagery.<br><span>Built by Param Factory · v1.1.0</span></p><nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/B-Divyesh/sf-csv-keyed-diff" rel="external" aria-label="Source on GitHub (external)">Source on GitHub</a></nav></div></footer>`;
 }
 
 function renderLegal(kind: 'privacy' | 'terms') {
@@ -57,7 +57,7 @@ function renderLegal(kind: 'privacy' | 'terms') {
       <h2>Network requests</h2><p>The app shell comes from this site. A Pro purchase or license check contacts the Sociobot billing API. That request includes the license token, but never CSV contents or filenames.</p><p>The app uses no advertising, analytics, tracking pixels, remote fonts, or third-party runtime scripts.</p>
       <h2>Your choices</h2><p>You can compare CSV files and export a CSV report without an account or payment. Do not verify a Pro license if you do not want a license request.</p><p>For a privacy request, use the repository link in the footer to contact the operator.</p>` : `<p class="lede">Use this tool only with data you are allowed to process.</p>
       <h2>The service</h2><p>CSV Keyed Diff compares files locally and produces a review report. Check its results before changing customer or business data.</p><p>The report is not a backup. It is not legal, financial, or compliance advice.</p>
-      <h2>Purchase and license</h2><p>CSV Keyed Diff Pro costs $19 once for one user. It adds JSON evidence export. The CSV comparison and CSV report remain free.</p><p>Sociobot and Dodo handle payment and refunds as merchant of record. A refund revokes the license.</p>
+      <h2>Purchase and license</h2><p>CSV Keyed Diff Pro costs $19 once for one user. It adds JSON evidence export. The CSV comparison and CSV report remain free.</p><p>Sociobot and Dodo are the merchant of record for payment and refund requests. If their license service reports a revoked license, the app removes Pro access.</p>
       <h2>Acceptable use and warranty</h2><p>Do not use the service unlawfully or disrupt it. The software is provided without warranties where the law permits.</p><p>Liability is limited to the amount paid for the license where the law permits.</p>`}
     <p class="policy-date">Effective 5 September 2026</p></main>${sharedFooter()}`;
 }
@@ -104,7 +104,7 @@ async function renderHome() {
 
     <section id="method" class="method" aria-labelledby="method-title"><div><p class="eyebrow">How it works</p><h2 id="method-title">Build a keyed change report</h2></div><ol><li><span>1</span><div><h3>Read CSV values</h3><p>The parser keeps UTF-8 text, quoted values, line breaks, and row order changes.</p></div></li><li><span>2</span><div><h3>Match exact keys</h3><p>You select one or more key columns. The app does not infer identities or use fuzzy matching.</p></div></li><li><span>3</span><div><h3>Separate duplicate keys</h3><p>Duplicate keys are listed for review and excluded from automatic pairing.</p></div></li></ol></section>
 
-    <section id="pro" class="pro-section" aria-labelledby="pro-title"><div><p class="eyebrow">Optional Pro license</p><h2 id="pro-title">Export JSON evidence with Pro</h2><p>The full keyed comparison and filtered CSV report are free. Pro adds a structured JSON file for implementation handoffs.</p></div><div class="price-panel"><p class="price"><span>$</span>19</p><p>One-time purchase · one user</p><ul><li>JSON evidence export</li><li>License restore on another device</li><li>CSV report stays free</li></ul><a id="buy" class="button primary" href="${checkoutUrl}">Buy Pro securely</a><button id="restore-toggle" class="text-button" type="button">Have a license? Restore it</button><form id="restore-form" hidden><label for="license-token">License token</label><div class="license-row"><input id="license-token" name="license" autocomplete="off" spellcheck="false"><button class="button secondary" type="submit">Verify license</button></div></form><p id="license-status" class="license-status" role="status" aria-live="polite"></p><p class="merchant">Sociobot and Dodo handle checkout as merchant of record. <a href="/terms">Read the terms</a>.</p></div></section>
+    <section id="pro" class="pro-section" aria-labelledby="pro-title"><div><p class="eyebrow">Optional Pro license</p><h2 id="pro-title">Export JSON evidence with Pro</h2><p>The full keyed comparison and filtered CSV report are free. Pro adds a structured JSON file for implementation handoffs.</p></div><div class="price-panel"><p class="price"><span>$</span>19</p><p>One-time purchase · one user</p><ul><li>JSON evidence export</li><li>License restore on another device</li><li>CSV report stays free</li></ul><a id="buy" class="button primary" href="${checkoutUrl}" rel="external" aria-label="Buy Pro securely — opens Sociobot checkout">Buy Pro securely (Sociobot checkout)</a><button id="restore-toggle" class="text-button" type="button">Have a license? Restore it</button><form id="restore-form" hidden><label for="license-token">License token</label><div class="license-row"><input id="license-token" name="license" autocomplete="off" spellcheck="false"><button class="button secondary" type="submit">Verify license</button></div></form><p id="license-status" class="license-status" role="status" aria-live="polite"></p><p class="merchant">Sociobot and Dodo handle checkout as merchant of record. <a href="/terms">Read the terms</a>.</p></div></section>
   </main>${sharedFooter()}<div id="update-toast" class="toast" hidden><span>An updated version is ready.</span><button class="button primary" id="reload">Reload app</button></div>`;
 
   type State = { before?: CsvData; after?: CsvData; keys: string[]; result?: DiffResult; filters: Set<string>; limit: number };
@@ -224,13 +224,14 @@ async function renderHome() {
       if (!state.filters.has(kind)) continue; total += items.length;
       for (const item of items) { if (shown >= state.limit) break; chunks.push(recordCard(kind, item)); shown++; }
     }
-    if (state.filters.has('duplicates')) { total += result.duplicates.length; for (const item of result.duplicates) { if (shown >= state.limit) break; chunks.push(`<details class="record duplicate"><summary><span class="status-word">Ambiguous</span><strong>${escapeHtml(item.key)}</strong><span>${item.before.length} before · ${item.after.length} after</span></summary><div class="record-body"><p>These rows share a key, so the app will not guess which records match.</p>${rowTable('Before rows', item.before)}${rowTable('After rows', item.after)}</div></details>`); shown++; } }
+    if (state.filters.has('duplicates')) { total += result.duplicates.length; for (const item of result.duplicates) { if (shown >= state.limit) break; chunks.push(`<details class="record duplicate"><summary><span class="status-word">Ambiguous</span><strong>${escapeHtml(item.key)}</strong><span>${item.before.length} before · ${item.after.length} after</span></summary><div class="record-body"><h3 class="record-title">Ambiguous record ${escapeHtml(item.key)}</h3><p>These rows share a key, so the app will not guess which records match.</p>${rowTable('Before rows', item.before)}${rowTable('After rows', item.after)}</div></details>`); shown++; } }
     element('records').innerHTML = chunks.length ? chunks.join('') : '<div class="empty-results"><span aria-hidden="true">◎</span><h3>No records in this view</h3><p>Select another report filter to inspect its records.</p></div>';
     const more = element<HTMLButtonElement>('more'); more.hidden = shown >= total; more.textContent = `Show ${Math.min(100, total - shown)} more records`;
   }
   function recordCard(kind: string, item: RecordChange) {
     const detail = kind === 'changed' ? `<div class="field-table" role="table" aria-label="Changed fields"><div class="field-head" role="row"><span role="columnheader">Field</span><span role="columnheader">Before</span><span role="columnheader">After</span></div>${item.fields.map((field) => `<div class="field-row" role="row"><strong role="cell">${escapeHtml(field.column)}</strong><span role="cell">${value(field.before)}</span><span role="cell">${value(field.after)}</span></div>`).join('')}</div>` : rowTable(kind === 'added' ? 'New row' : 'Previous row', [kind === 'added' ? item.after! : item.before!]);
-    return `<details class="record ${kind}"><summary><span class="status-word">${kind}</span><strong>${escapeHtml(item.key)}</strong><span>${kind === 'changed' ? `${item.fields.length} field${item.fields.length === 1 ? '' : 's'}` : 'Full record'}</span></summary><div class="record-body">${detail}</div></details>`;
+    const title = `${kind.slice(0, 1).toUpperCase()}${kind.slice(1)} record`;
+    return `<details class="record ${kind}"><summary><span class="status-word">${kind}</span><strong>${escapeHtml(item.key)}</strong><span>${kind === 'changed' ? `${item.fields.length} field${item.fields.length === 1 ? '' : 's'}` : 'Full record'}</span></summary><div class="record-body"><h3 class="record-title">${title} ${escapeHtml(item.key)}</h3>${detail}</div></details>`;
   }
   function value(text: string) { return text === '' ? '<i class="empty-value">empty</i>' : `<span class="cell-value">${escapeHtml(text)}</span>`; }
   function rowTable(title: string, rows: Record<string, string>[]) { return `<div class="row-group"><h4>${title}</h4>${rows.length ? rows.map((row) => `<dl>${Object.entries(row).map(([key, val]) => `<div><dt>${escapeHtml(key)}</dt><dd>${value(val)}</dd></div>`).join('')}</dl>`).join('') : '<p>No matching row appears in this file.</p>'}</div>`; }
@@ -250,20 +251,20 @@ async function renderHome() {
     try {
       const verdict = await verifyLicense(force);
       if (verdict?.valid) { element('license-status').innerHTML = '<strong>Pro is active on this device.</strong> JSON export is ready.'; if (state.result) element('export-json').hidden = false; }
-      else if (verdict) { removeLicense(); element('license-status').innerHTML = `The license is not active (${escapeHtml(verdict.reason ?? 'invalid')}). <a href="${checkoutUrl}">Buy a new license</a>.`; if (state.result) element('export-json').hidden = true; }
-    } catch { element('license-status').textContent = cached.unlocked ? 'Pro remains available offline. The app will check again later.' : 'The license could not be checked. Check your connection and try again.'; }
+      else if (verdict) { removeLicense(); element('license-status').innerHTML = `The license is not active (${escapeHtml(verdict.reason ?? 'invalid')}). <a href="${checkoutUrl}" rel="external" aria-label="Buy a new license — opens Sociobot checkout">Buy a new license (Sociobot checkout)</a>.`; if (state.result) element('export-json').hidden = true; }
+    } catch { element('license-status').textContent = cached.unlocked ? 'Pro remains available offline. It will check when you are online.' : 'The license could not be checked. Check your connection and try again.'; }
   }
-  await restore(); await reconcileLicense(); setupConnectivity(); registerServiceWorker();
+  await restore(); await reconcileLicense(); setupConnectivity(() => { void reconcileLicense(true); }); registerServiceWorker();
 }
 
 function fileWell(side: 'before' | 'after', number: string, title: string, subtitle: string) {
   return `<div><div class="step-label"><span>${number}</span><div><h3>${title}</h3><p>${subtitle}</p></div></div><label id="well-${side}" class="file-well" data-side="${side}" for="file-${side}"><input id="file-${side}" data-side="${side}" type="file" accept=".csv,text/csv"><span class="file-icon" aria-hidden="true">↥</span><span id="facts-${side}" class="file-facts"><strong>Choose or drop a CSV</strong><span>Files over 50 MiB are rejected. This file stays on your device.</span></span><span class="button secondary">Browse files</span></label></div>`;
 }
 
-function setupConnectivity() {
+function setupConnectivity(onReconnect?: () => void) {
   const banner = document.getElementById('offline-banner')!;
   const update = () => { banner.hidden = navigator.onLine; };
-  addEventListener('online', update); addEventListener('offline', update); update();
+  addEventListener('online', () => { update(); onReconnect?.(); }); addEventListener('offline', update); update();
 }
 
 function registerServiceWorker() {

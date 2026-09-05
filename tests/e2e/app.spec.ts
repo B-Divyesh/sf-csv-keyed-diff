@@ -72,6 +72,33 @@ test('demo opens with the sample report and persistent label in the first viewpo
   expect(accessibility.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
 });
 
+test('expanded result records announce a level-three record heading before their detail groups', async ({ page }) => {
+  await page.goto('/demo');
+  for (const selector of ['.record.changed summary', '.record.added summary', '.record.duplicate summary']) await page.locator(selector).first().click();
+  const changedTree = await page.locator('.record.changed').first().ariaSnapshot();
+  const addedTree = await page.locator('.record.added').ariaSnapshot();
+  const duplicateTree = await page.locator('.record.duplicate').ariaSnapshot();
+  expect(changedTree).toContain('heading "Changed record account_id=AC-1042" [level=3]');
+  expect(addedTree).toContain('heading "Added record account_id=AC-1204" [level=3]');
+  expect(addedTree).toContain('heading "New row" [level=4]');
+  expect(duplicateTree).toContain('heading "Ambiguous record account_id=AC-1130" [level=3]');
+  expect(duplicateTree).toContain('heading "Before rows" [level=4]');
+  const levels = await page.locator('#results h2, #results .record[open] h3, #results .record[open] h4')
+    .evaluateAll((headings) => headings.map((heading) => Number(heading.tagName.slice(1))));
+  expect(levels[0]).toBe(2);
+  for (let index = 1; index < levels.length; index += 1) expect(levels[index]).toBeLessThanOrEqual(levels[index - 1]! + 1);
+});
+
+test('external destinations announce where the user will go', async ({ page }) => {
+  await page.goto('/');
+  const checkout = page.getByRole('link', { name: 'Buy Pro securely — opens Sociobot checkout' });
+  const source = page.getByRole('link', { name: 'Source on GitHub (external)' });
+  await expect(checkout).toBeVisible();
+  await expect(source).toBeVisible();
+  expect(await checkout.evaluate((link) => new URL((link as HTMLAnchorElement).href).origin)).toBe('https://api.sociobot.in');
+  expect(await source.evaluate((link) => new URL((link as HTMLAnchorElement).href).origin)).toBe('https://github.com');
+});
+
 test('reduced motion removes smooth scrolling and visible transition duration', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');

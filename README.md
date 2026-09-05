@@ -14,9 +14,11 @@ One-click sample: <https://csv-keyed-diff.sociobot.in/demo>
 - Lists duplicate-key groups without guessing which records match.
 - Filters the review and exports the same evidence as CSV.
 - Restores a real session from local IndexedDB after a refresh.
-- Works offline after the first visit.
+- Keeps a populated comparison and its CSV export working offline after the first visit.
 
 The complete comparison and CSV report are free. A $19 one-time Pro license for one user adds JSON evidence export.
+
+A cached Pro license keeps JSON evidence available offline and checks again when the connection returns. If the license service reports it revoked, Pro access is removed.
 
 CSV files stay in the browser. The app has no analytics, tracking pixel, remote font, or third-party runtime script.
 

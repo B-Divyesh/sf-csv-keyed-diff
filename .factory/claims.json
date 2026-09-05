@@ -15,10 +15,10 @@
   },
   {
     "id": "offline-reload",
-    "claim": "The populated comparison works offline after the first visit.",
+    "claim": "The populated comparison and CSV evidence export work offline after the first visit.",
     "where": "landing facts, offline banner, README",
     "test": "npm run test:claims -- --grep \"@claim:offline-reload\"",
-    "sandbox": "dedicated fresh browser context; load /demo, wait for service-worker control, set the context offline, and reload"
+    "sandbox": "dedicated fresh browser context; load /demo, wait for service-worker control, set the context offline, reload, and download the populated CSV evidence"
   },
   {
     "id": "csv-values",
@@ -89,6 +89,20 @@
     "where": "Pro section, privacy page, terms, README",
     "test": "npm run test:claims -- --grep \"@claim:pro-json\" && npm run test:live-checkout",
     "sandbox": "fresh /demo entry; start for real, use a recorded valid verification response, restore the token, and inspect JSON; then verify the public hosted checkout registration"
+  },
+  {
+    "id": "pro-offline",
+    "claim": "A cached Pro license keeps JSON evidence available offline and checks again when the connection returns.",
+    "where": "license status, README",
+    "test": "npm run test:claims -- --grep \"@claim:pro-offline\"",
+    "sandbox": "dedicated fresh context; save a real report and a stale valid license verdict, reload offline to export JSON, then restore connectivity and observe one recorded verification request"
+  },
+  {
+    "id": "pro-revocation",
+    "claim": "When the license service reports a saved Pro license revoked, the app removes Pro JSON access.",
+    "where": "terms, license status, README",
+    "test": "npm run test:claims -- --grep \"@claim:pro-revocation\"",
+    "sandbox": "fresh /demo entry; start for real with a cached valid license and report, return a recorded revoked verdict, then confirm the token and JSON export are removed"
   },
   {
     "id": "exact-matching",
