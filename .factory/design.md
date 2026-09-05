@@ -33,6 +33,8 @@ An 8px base rhythm with 4px for tight label relationships. Content is capped at 
 
 Controls are at least 44px tall, adjacent actions have 8px separation, and table density is reserved for the report rather than the setup flow.
 
+The refined landing composition caps the primary surface at 1180px. The hero uses a compact editorial split with the title and actions on the left and a smaller, faded inspection image on the right. Thin iris, aqua, and coral comparison rows cross the image to connect the illustration to the product output. The warm work area overlaps the hero by 28px, making upload and review feel like one continuous task surface. Step numbers use large circular outlines; upload targets use heavier dashed borders and 10px corners. Results use a denser five-column summary and thin status rails instead of separate dashboard cards.
+
 ## Interaction grammar
 
 - Dropping a file “places a specimen”: the well changes from dashed to solid and reveals file facts.
