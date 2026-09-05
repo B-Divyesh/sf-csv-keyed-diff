@@ -1,6 +1,18 @@
-# CSV Keyed Diff — repair 4 handoff
+# CSV Keyed Diff — handoff
 
-## Release status: PASS
+## Current review status: FAIL
+
+Review 2 on 5 September 2026 found three findings and three untested public
+claims. The implementation remains functionally sound and all 15 declared
+claim commands pass, but release acceptance is blocked by incomplete claim
+coverage, a skipped result heading level, and missing external-link cues. See
+`.factory/review-2.md` for the evidence and exact required results.
+
+No product code changed during Review 2. The implementation reviewed remains
+`9093ee32c4cdfac3e4acb415b242fb87d5757f0d`; the documentation base before the
+new review report was `278c061197668ef71ca48fc589d9cffa525234c1`.
+
+## Repair 4 status (historical): PASS
 
 Repair 4 resolved all seven findings from `.factory/review-1.md` and replaced the sixteen untested claims with fifteen bounded, registered claims. The untestable “All future Pro refinements” promise was removed instead of being renamed.
 
@@ -143,3 +155,14 @@ Verification gates:
 
 The full independent report is `.factory/verification-5.md`; copied runtime
 evidence is under `/work/.evidence/`.
+
+## Review 2 next steps
+
+1. Register and test offline CSV export, cached-Pro offline recheck, and
+   refund/revocation behavior, or narrow those public statements.
+2. Repair the expanded result outline so row-group headings do not skip from
+   level 2 to level 4.
+3. Mark the GitHub source and hosted checkout links as external in their
+   visible or accessible names.
+4. Rerun every claim command and the strict live review. Do not restore PASS
+   until the finding and untested-claim counts are both zero.
