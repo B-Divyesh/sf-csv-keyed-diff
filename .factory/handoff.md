@@ -9,8 +9,9 @@ documentation head was `9752fd258abd95b85e284364cc18c611e059a5cc`.
 The static deployment wrapper uploaded the fresh `dist/` artifact to the
 existing `sf-csv-keyed-diff` static app on 5 September 2026. Live HTML points
 to `assets/index-mgvPs1p4.js` and `assets/index-aDf2Ukhd.css`; both bytes match
-the local build. The report-only documentation commit is recorded separately
-after this handoff is committed and does not change the deployed artifact.
+the local build. Verification documentation commit:
+`77d4ba8daff4afd0845291ff4e8e992baaed3f87`; it is report-only and does not
+change the deployed artifact.
 
 ## What this repair changed
 
